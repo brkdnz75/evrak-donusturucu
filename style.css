@@ -1,0 +1,358 @@
+/* ÖNCEKİ TÜM CSS'İ SİL VE BUNU YAPIŞTIR */
+
+/* Modern Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-app: #09090b;       /* Daha derin siyah */
+  --bg-panel: #18181b;     /* Hafif açık panel */
+  --bg-card: #27272a;      /* Kartlar daha belirgin */
+  --bg-input: #121214;     /* Inputlar daha koyu */
+  
+  --accent: #6366f1;       /* Modern Indigo */
+  --accent-glow: rgba(99, 102, 241, 0.5);
+  --text-main: #f4f4f5;
+  --text-muted: #a1a1aa;
+  
+  --border: rgba(255,255,255,0.08);
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif; /* Temiz font */
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  /* Arka plana hafif, şık bir ızgara ve ışık efekti */
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15), transparent 40%),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding-top: 40px;
+}
+
+.app {
+  width: min(1100px, 95vw);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Üst Bar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo {
+  width: 40px; height: 40px;
+  background: var(--accent);
+  border-radius: 10px;
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+.title { font-weight: 700; font-size: 18px; }
+.subtitle { color: var(--text-muted); font-size: 13px; font-weight: 400; }
+
+.actions { display: flex; gap: 10px; }
+
+/* Butonlar */
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: white;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn:hover { background: #3f3f46; }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+.btn-primary:hover {
+  background: #4f46e5;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+/* Input Alanı (Panel) */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.5fr; /* Ad, Soyad, Hint */
+  gap: 20px;
+  align-items: end;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: 0.2s;
+}
+
+.field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Sağdaki Bilgi Kutusu */
+.hint {
+  font-size: 13px;
+  color: #c7d2fe;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  padding: 12px 16px;
+  border-radius: 8px;
+  height: 44px; /* Input yüksekliğiyle eşitle */
+  display: flex;
+  align-items: center;
+}
+
+/* Kartlar Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-head {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-title { font-weight: 600; font-size: 15px; }
+.card-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* Dropzone (Sürükle Bırak Alanı) */
+.dropzone {
+  margin: 16px;
+  height: 140px;
+  border: 2px dashed rgba(255,255,255,0.15);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 10px;
+}
+
+.dropzone:hover {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.05);
+  color: var(--text-main);
+}
+
+/* KIRIK RESİM DÜZELTMESİ */
+/* Resim yüklenmediyse alanı gizle veya şık göster */
+.thumbWrap {
+  margin: 0 16px 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  display: none; /* Varsayılan olarak gizli, JS ile açmalısın */
+}
+
+/* Eğer JS ile aç-kapa yapmıyorsan, boş img etiketlerini gizle: */
+img[src=""], img:not([src]) {
+  display: none;
+}
+
+/* Yüklenmiş resim varsa wrapper görünür olsun (bunu JS ile 'show' classı ekleyerek yapman lazım) */
+.thumbWrap.show {
+  display: block;
+  border: 1px solid var(--border);
+}
+
+.thumb {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.resultActions {
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding-bottom: 20px;
+}
+
+/* Küçük ekran ayarı */
+@media (max-width: 800px) {
+  .grid { grid-template-columns: 1fr; }
+  .row { grid-template-columns: 1fr; }
+}
+/* --- DURUM ÇUBUĞU --- */
+.statusRow {
+  margin: 0 16px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Badge (Etiketler) - Daha zarif ve neon etkili */
+.badge {
+  padding: 4px 10px;
+  border-radius: 6px; /* Tam yuvarlak yerine hafif köşeli modern yapı */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Bekleme Modu (Indigo) */
+.badge-ready {
+  border-color: rgba(99, 102, 241, 0.25);
+  background: rgba(99, 102, 241, 0.1);
+  color: #a5b4fc; /* Soft Indigo */
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.05); /* Hafif Glow */
+}
+
+/* Başarılı Modu (Emerald Green - Daha modern yeşil) */
+.badge-ok {
+  border-color: rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.1);
+  color: #6ee7b7;
+}
+
+/* --- BUTON DURUMLARI --- */
+.btn.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1); /* Rengi soldurur */
+  pointer-events: auto; /* Tıklayınca uyarı verdirmek istersen açık kalsın */
+}
+
+/* --- PDF PLACEHOLDER (Dosya Yüklendiğinde Görünecek Alan) --- */
+
+/* Varsayılan thumbWrap ayarlarını ezmek için */
+.thumbWrap.placeholder {
+  display: flex !important; /* Görünür yap */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2); /* İçeri gömük koyu zemin */
+  border: 1px solid var(--border); /* Kesik çizgi yerine düz zarif çizgi */
+  border-radius: 8px;
+  margin: 0 16px 16px;
+  height: 200px; /* Sabit yükseklik, düzen bozulmaz */
+  transition: border-color 0.2s;
+}
+
+/* Hover durumunda hafif tepki */
+.thumbWrap.placeholder:hover {
+  border-color: rgba(255,255,255,0.15);
+}
+
+.pdfHolder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+}
+
+.pdfIcon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  /* Icon için cam efekti */
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #e2e8f0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.pdfName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-main);
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdfHint {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.05);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+

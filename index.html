@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Evrak Dönüştürücü</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="title">Evrak Dönüştürücü</div>
+          <div class="subtitle">PDF evrakları aday adına göre JPEG’e çevir</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="btnConvert" class="btn btn-primary" disabled title="PDF → JPEG">
+          <span class="ico">🔄</span> Dönüştür
+        </button>
+        <button id="btnDownloadAll" class="btn" disabled title="Hepsini indir">
+          <span class="ico">⏬</span> Hepsini indir
+        </button>
+      </div>
+    </header>
+
+    <section class="panel">
+      <div class="row">
+        <div class="field">
+          <label for="firstName">Ad</label>
+          <input id="firstName" autocomplete="off" placeholder="Örn: Berke" />
+        </div>
+        <div class="field">
+          <label for="lastName">Soyad</label>
+          <input id="lastName" autocomplete="off" placeholder="Örn: Deniz" />
+        </div>
+
+        <div class="hint">
+          Dosya adları: <span class="mono">Ad_Soyad_evrak.jpeg</span>
+        </div>
+      </div>
+    </section>
+
+    <main class="grid">
+      <!-- Sabıka -->
+      <section class="card" data-doc="sabika_kaydi">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Sabıka Kaydı</div>
+            <div class="card-desc">PDF yükle → JPEG üret</div>
+          </div>
+          <div class="card-tools">
+            <input class="fileInput" type="file" accept="application/pdf" hidden />
+            <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
+            <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
+          </div>
+        </div>
+
+        <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
+          <div class="dz-inner">
+            <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
+            <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+          </div>
+          <div class="fileMeta hidden"></div>
+        </div>
+
+        <div class="result hidden">
+          <div class="thumbWrap">
+            <img class="thumb" alt="JPEG önizleme" />
+          </div>
+          <div class="resultActions">
+            <a class="btn btn-ghost btnDownload" download>⏬ JPEG indir</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Diploma -->
+      <section class="card" data-doc="diploma">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Diploma</div>
+            <div class="card-desc">PDF yükle → JPEG üret</div>
+          </div>
+          <div class="card-tools">
+            <input class="fileInput" type="file" accept="application/pdf" hidden />
+            <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
+            <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
+          </div>
+        </div>
+
+        <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
+          <div class="dz-inner">
+            <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
+            <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+          </div>
+          <div class="fileMeta hidden"></div>
+        </div>
+
+        <div class="result hidden">
+          <div class="thumbWrap">
+            <img class="thumb" alt="JPEG önizleme" />
+          </div>
+          <div class="resultActions">
+            <a class="btn btn-ghost btnDownload" download>⏬ JPEG indir</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sağlık -->
+      <section class="card" data-doc="saglik_raporu">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Sağlık Raporu</div>
+            <div class="card-desc">PDF yükle → JPEG üret</div>
+          </div>
+          <div class="card-tools">
+            <input class="fileInput" type="file" accept="application/pdf" hidden />
+            <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
+            <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
+          </div>
+        </div>
+
+        <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
+          <div class="dz-inner">
+            <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
+            <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+          </div>
+          <div class="fileMeta hidden"></div>
+        </div>
+
+        <div class="result hidden">
+          <div class="thumbWrap">
+            <img class="thumb" alt="JPEG önizleme" />
+          </div>
+          <div class="resultActions">
+            <a class="btn btn-ghost btnDownload" download>⏬ JPEG indir</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="small">
+        İpucu: “Hepsini indir” için ZIP oluşturulur.
+      </div>
+    </footer>
+  </div>
+
+ 
+  <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"></script>
+  <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="app.js"></script>
+  
+</html>
