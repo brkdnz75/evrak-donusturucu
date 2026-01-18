@@ -355,4 +355,21 @@ img[src=""], img:not([src]) {
   padding: 4px 8px;
   border-radius: 4px;
 }
+.bio-controls{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding: 12px 16px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.bio-label{ opacity:.9; text-transform: uppercase; letter-spacing:.4px; font-weight:600; }
+.bio-size, .bio-bg{
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 8px 10px;
+  outline: none;
+}
 
