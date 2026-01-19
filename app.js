@@ -1,4 +1,4 @@
-// pdf.js global ayarı
+// pdf.js global
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
 
@@ -32,23 +32,9 @@ function canConvert() {
 }
 
 function updateTopButtons() {
-  const btnConvert = $("#btnConvert");
-  const btnDownloadAll = $("#btnDownloadAll");
-  const btnClearAll = $("#btnClearAll");
-
-  const hasFiles = canConvert();
-
-  if (btnConvert) btnConvert.disabled = !hasFiles;
-
+  $("#btnConvert").disabled = !canConvert();
   const anyOut = Object.values(state.outputs).some(Boolean);
-  if (btnDownloadAll) btnDownloadAll.disabled = !anyOut;
-
-  // Dosya yüklüyse, çıktı varsa VEYA isim girildiyse "Temizle" butonu aktif olsun
-  if (btnClearAll) {
-    const hasText = ($("#firstName").value || "").trim().length > 0 ||
-                    ($("#lastName").value || "").trim().length > 0;
-    btnClearAll.disabled = !(hasFiles || hasText || anyOut);
-  }
+  $("#btnDownloadAll").disabled = !anyOut;
 }
 
 function formatBytes(bytes) {
@@ -57,21 +43,6 @@ function formatBytes(bytes) {
   let v = bytes, i = 0;
   while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
   return `${v.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
-}
-
-// ===================== DRAG & DROP NAME HELPER =====================
-/**
- * Resmi masaüstüne sürükleyince ismin doğru gelmesini sağlayan fonksiyon.
- * (Chrome/Edge gibi Chromium tabanlı tarayıcılarda çalışır)
- */
-function enableDragToSave(imgElement, url, filename) {
-  // ondragstart kullanıyoruz ki her seferinde listener ekleyip şişirmeyelim
-  imgElement.ondragstart = (e) => {
-    if (url && filename) {
-      // Format: MIME_TYPE:FILENAME:URL
-      e.dataTransfer.setData("DownloadURL", `image/jpeg:${filename}:${url}`);
-    }
-  };
 }
 
 // ===================== PDF -> JPEG =====================
@@ -127,6 +98,13 @@ async function imageFileToCanvas(file) {
   }
 }
 
+/**
+ * MediaPipe segmentation ile arka planı beyaza çeker.
+ * - İnsan bölgesi korunur
+ * - Arka plan saf beyaz olur
+ *
+ * Gereksinim: index.html içinde SelfieSegmentation script'i yüklü olmalı.
+ */
 async function whitenBackgroundWithSegmentation(srcCanvas) {
   if (typeof SelfieSegmentation === "undefined") {
     throw new Error("SelfieSegmentation yüklenmedi. index.html'e mediapipe script'i ekle.");
@@ -150,15 +128,19 @@ async function whitenBackgroundWithSegmentation(srcCanvas) {
         outCanvas.height = h;
         const ctx = outCanvas.getContext("2d");
 
+        // 1) Orijinal resmi çiz
         ctx.drawImage(srcCanvas, 0, 0);
 
+        // 2) Maskeyle arka planı kes (sadece insan kalsın)
         ctx.globalCompositeOperation = "destination-in";
         ctx.drawImage(results.segmentationMask, 0, 0, w, h);
 
+        // 3) Arkaya beyaz bas
         ctx.globalCompositeOperation = "destination-over";
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, w, h);
 
+        // 4) normale dön
         ctx.globalCompositeOperation = "source-over";
 
         resolve(outCanvas);
@@ -171,6 +153,7 @@ async function whitenBackgroundWithSegmentation(srcCanvas) {
   });
 }
 
+// Merkezden kırp + hedef boyuta ölçekle + opsiyonel arka plan beyaz
 async function makeBiometricJpeg(file, sizeStr, doWhiten) {
   const { canvas: srcCanvas } = await imageFileToCanvas(file);
 
@@ -219,6 +202,8 @@ async function makeBiometricJpeg(file, sizeStr, doWhiten) {
 // ===================== PDF CARD LOGIC =====================
 function attachCardLogic(card) {
   const docKey = card.dataset.doc;
+
+  // biyometrik kart bu fonksiyona girmesin
   if (docKey === "biyometrik_foto") return;
 
   const fileInput = $(".fileInput", card);
@@ -234,21 +219,11 @@ function attachCardLogic(card) {
   const thumb = $(".thumb", card);
   const btnDownload = $(".btnDownload", card);
 
-  // Eksik element kontrolü
-  const missing = [];
-  if (!fileInput) missing.push("fileInput");
-  if (!dropzone) missing.push("dropzone");
-  if (!meta) missing.push("meta");
-  if (!dzInner) missing.push("dzInner");
-  if (!btnAdd) missing.push("btnAdd");
-  if (!btnClear) missing.push("btnClear");
-  if (!result) missing.push("result");
-  if (!thumbWrap) missing.push("thumbWrap");
-  if (!thumb) missing.push("thumb");
-  if (!btnDownload) missing.push("btnDownload");
-
-  if (missing.length) {
-    console.error(`❌ Kart '${docKey}' eksik elementler:`, missing);
+  // ✅ Null koruması (sayfa çökmesin)
+  if (!fileInput || !dropzone || !meta || !dzInner || !btnAdd || !btnClear || !result || !thumbWrap || !thumb || !btnDownload) {
+    console.error("PDF kartında eksik element var:", docKey, {
+      fileInput, dropzone, meta, dzInner, btnAdd, btnClear, result, thumbWrap, thumb, btnDownload
+    });
     return;
   }
 
@@ -266,21 +241,11 @@ function attachCardLogic(card) {
   const statusBadge = statusHost.querySelector("span");
   const statusInfo = statusHost.querySelectorAll("span")[1];
 
-  function lockDownload() {
-    btnDownload.classList.add("is-disabled");
-    btnDownload.setAttribute("aria-disabled", "true");
-    btnDownload.removeAttribute("href");
-    btnDownload.removeAttribute("download");
-  }
-
-  function unlockDownload(out) {
-    btnDownload.href = out.url;
-    btnDownload.setAttribute("download", out.filename);
-    btnDownload.classList.remove("is-disabled");
-    btnDownload.setAttribute("aria-disabled", "false");
-  }
-
-  lockDownload();
+  // Download kilitli
+  btnDownload.classList.add("is-disabled");
+  btnDownload.setAttribute("aria-disabled", "true");
+  btnDownload.removeAttribute("href");
+  btnDownload.removeAttribute("download");
 
   btnDownload.addEventListener("click", (e) => {
     const out = state.outputs[docKey];
@@ -317,15 +282,11 @@ function attachCardLogic(card) {
 
     thumb.removeAttribute("src");
     thumb.src = out.url;
-
-    // --- SÜRÜKLE BIRAK İLE İSİMLENDİRME ---
-    enableDragToSave(thumb, out.url, out.filename);
   }
 
   function showFileMeta(file) {
     dzInner.classList.add("hidden");
     meta.classList.remove("hidden");
-
     meta.innerHTML = `
       <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
         <div style="font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
@@ -341,6 +302,13 @@ function attachCardLogic(card) {
     statusInfo.textContent = file.name;
 
     showPdfPlaceholder(file);
+  }
+
+  function resetDownloadLocked() {
+    btnDownload.classList.add("is-disabled");
+    btnDownload.setAttribute("aria-disabled", "true");
+    btnDownload.removeAttribute("href");
+    btnDownload.removeAttribute("download");
   }
 
   function clearAll() {
@@ -364,7 +332,7 @@ function attachCardLogic(card) {
     statusBadge.textContent = "Henüz PDF yüklenmedi";
     statusInfo.textContent = "";
 
-    lockDownload();
+    resetDownloadLocked();
     updateTopButtons();
   }
 
@@ -383,8 +351,9 @@ function attachCardLogic(card) {
     state.files[docKey] = file;
     btnClear.disabled = false;
 
-    lockDownload();
+    resetDownloadLocked();
     showFileMeta(file);
+
     updateTopButtons();
   }
 
@@ -399,18 +368,18 @@ function attachCardLogic(card) {
 
   ["dragenter", "dragover"].forEach(evt => {
     dropzone.addEventListener(evt, (e) => {
-      e.preventDefault(); e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
       dropzone.classList.add("dragover");
     });
   });
-
   ["dragleave", "drop"].forEach(evt => {
     dropzone.addEventListener(evt, (e) => {
-      e.preventDefault(); e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
       dropzone.classList.remove("dragover");
     });
   });
-
   dropzone.addEventListener("drop", (e) => {
     const file = e.dataTransfer?.files?.[0];
     setFile(file);
@@ -418,8 +387,13 @@ function attachCardLogic(card) {
 
   card.__setOutput = (out) => {
     if (!out) return;
+
     showJpegPreview(out);
-    unlockDownload(out);
+
+    btnDownload.href = out.url;
+    btnDownload.setAttribute("download", out.filename);
+    btnDownload.classList.remove("is-disabled");
+    btnDownload.setAttribute("aria-disabled", "false");
 
     statusBadge.className = "badge badge-ok";
     statusBadge.textContent = "Dönüştürüldü ✅";
@@ -448,11 +422,13 @@ function attachBioLogic(card) {
   const thumbWrap = $(".thumbWrap", card);
   const btnDownload = $(".btnDownloadBio", card);
 
+  // ✅ Null koruması
   if (!imgInput || !btnAdd || !btnClear || !dropzone || !meta || !dzInner || !result || !thumbWrap || !btnDownload) {
-    console.error("Biyometrik kartında eksik element var.");
+    console.error("Biyometrik kartında eksik element var:", { imgInput, btnAdd, btnClear, dropzone, meta, dzInner, result, thumbWrap, btnDownload });
     return;
   }
 
+  // Durum satırı
   let statusHost = $(".statusRow", card);
   if (!statusHost) {
     statusHost = document.createElement("div");
@@ -541,6 +517,7 @@ function attachBioLogic(card) {
 
     lockDownload();
     showFileMeta(file);
+
     updateTopButtons();
   }
 
@@ -611,9 +588,6 @@ function attachBioLogic(card) {
     img.src = out.url;
     thumbWrap.appendChild(img);
 
-    // --- SÜRÜKLE BIRAK İLE İSİMLENDİRME ---
-    enableDragToSave(img, out.url, out.filename);
-
     unlockDownload(out);
 
     statusBadge.className = "badge badge-ok";
@@ -624,7 +598,7 @@ function attachBioLogic(card) {
   };
 
   card.__clear = clearAll;
-}
+};
 
 // ===================== FILENAME HELPERS =====================
 function buildFilename(docKey) {
@@ -735,25 +709,6 @@ async function downloadAllZip() {
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
-// ===================== CLEAR EVERYTHING =====================
-function clearEverything() {
-  if (!confirm("Tüm yüklenen dosyalar ve girilen isimler silinecek. Emin misiniz?")) {
-    return;
-  }
-
-  $("#firstName").value = "";
-  $("#lastName").value = "";
-
-  const cards = $$(".card");
-  cards.forEach(card => {
-    if (typeof card.__clear === "function") {
-      card.__clear();
-    }
-  });
-
-  updateTopButtons();
-}
-
 // ===================== WIRE UP =====================
 function wireUp() {
   $$(".card").forEach((card) => {
@@ -761,25 +716,15 @@ function wireUp() {
     else attachCardLogic(card);
   });
 
-  const fnInput = $("#firstName");
-  const lnInput = $("#lastName");
+  ["input", "change"].forEach(evt => {
+    $("#firstName").addEventListener(evt, updateTopButtons);
+    $("#lastName").addEventListener(evt, updateTopButtons);
+  });
 
-  if(fnInput) {
-    ["input", "change"].forEach(evt => fnInput.addEventListener(evt, updateTopButtons));
-  }
-  if(lnInput) {
-    ["input", "change"].forEach(evt => lnInput.addEventListener(evt, updateTopButtons));
-  }
-
-  const btnConvert = $("#btnConvert");
-  const btnDownloadAll = $("#btnDownloadAll");
-  const btnClearAll = $("#btnClearAll");
-
-  if(btnConvert) btnConvert.addEventListener("click", convertAll);
-  if(btnDownloadAll) btnDownloadAll.addEventListener("click", downloadAllZip);
-  if(btnClearAll) btnClearAll.addEventListener("click", clearEverything);
+  $("#btnConvert").addEventListener("click", convertAll);
+  $("#btnDownloadAll").addEventListener("click", downloadAllZip);
 
   updateTopButtons();
 }
 
-window.addEventListener("DOMContentLoaded", wireUp);
+wireUp();
