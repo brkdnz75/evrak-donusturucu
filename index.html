@@ -8,6 +8,7 @@
 </head>
 <body>
   <div class="app">
+
     <header class="topbar">
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
@@ -16,198 +17,214 @@
           <div class="subtitle">PDF evrakları aday adına göre JPEG’e çevir</div>
         </div>
       </div>
-
-      <div class="actions">
-        <button id="btnClearAll" class="btn" disabled title="Tüm alanları temizle">
-          <span class="ico">🗑️</span> Temizle
-        </button>
-
-        <button id="btnConvert" class="btn btn-primary" disabled title="PDF → JPEG">
-          <span class="ico">🔄</span> Dönüştür
-        </button>
-        <button id="btnDownloadAll" class="btn" disabled title="Hepsini indir">
-          <span class="ico">⏬</span> Hepsini indir
-        </button>
-      </div>
     </header>
 
-    <section class="panel">
-      <div class="row">
-        <div class="field">
-          <label for="firstName">Ad</label>
-          <input id="firstName" autocomplete="off" placeholder="Örn: Berke" />
-        </div>
-        <div class="field">
-          <label for="lastName">Soyad</label>
-          <input id="lastName" autocomplete="off" placeholder="Örn: Deniz" />
-        </div>
+    <div class="layout">
 
-        <div class="hint">
-          Dosya adları: <span class="mono">Ad_Soyad_evrak.jpeg</span>
-        </div>
-      </div>
-    </section>
+      <!-- SOL: AD / SOYAD + BUTONLAR -->
+      <aside class="sidebar">
+        <div class="side-card">
+          <div class="field">
+            <label for="firstName">Ad</label>
+            <input id="firstName" autocomplete="off" placeholder="Örn: Berke" />
+          </div>
 
-    <main class="grid">
+          <div class="field">
+            <label for="lastName">Soyad</label>
+            <input id="lastName" autocomplete="off" placeholder="Örn: Deniz" />
+          </div>
 
-      <section class="card" data-doc="sabika_kaydi">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Sabıka Kaydı</div>
-            <div class="card-desc">PDF yükle → JPEG üret</div>
+          <div class="side-actions">
+            <button id="btnConvert" class="btn btn-primary" disabled>🔄 Dönüştür</button>
+            <button id="btnDownloadAll" class="btn" disabled>⏬ Hepsini indir</button>
+            <button id="btnClearAll" class="btn btn-danger" disabled>🗑️ Temizle</button>
           </div>
-          <div class="card-tools">
-            <input class="fileInput" type="file" accept="application/pdf" hidden />
-            <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
-            <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
-          </div>
-        </div>
 
-        <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
-          <div class="dz-inner">
-            <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
-            <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+          <div class="side-hint">
+            Dosya adları: <span class="mono">Ad_Soyad_evrak.jpeg</span>
           </div>
-          <div class="fileMeta hidden"></div>
         </div>
+      </aside>
 
-        <div class="result hidden">
-          <div class="thumbWrap">
-            <img class="thumb" alt="JPEG önizleme" />
-          </div>
-          <div class="resultActions">
-            <a class="btn btn-ghost btnDownload" download>⏬ JPEG indir</a>
-          </div>
-        </div>
-      </section>
+      <!-- SAĞ: GRID -->
+      <main class="cardsGrid">
 
-      <section class="card" data-doc="diploma">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Diploma</div>
-            <div class="card-desc">PDF yükle → JPEG üret</div>
+        <!-- BIOMETRIK: ÜST SATIRI KOMPLE KAPLAR, İÇİ 2 KOLON (SOL upload / SAĞ çıktı) -->
+        <section class="card card-bio" data-doc="biyometrik_foto">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Biyometrik Foto</div>
+              <div class="card-desc">Arka plan beyaz + ölçülendir</div>
+            </div>
+            <div class="card-tools">
+              <input class="imgInput" type="file" accept="image/*" hidden />
+              <button class="iconBtn btnAddImg" title="Fotoğraf ekle">➕</button>
+              <button class="iconBtn btnConvertBio" title="Bu kartı dönüştür" disabled>🔄</button>
+              <button class="iconBtn btnClearImg" title="Temizle" disabled>✖</button>
+            </div>
+            
           </div>
-          <div class="card-tools">
-            <input class="fileInput" type="file" accept="application/pdf" hidden />
-            <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
-            <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
-          </div>
-        </div>
 
-        <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
-          <div class="dz-inner">
-            <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
-            <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
-          </div>
-          <div class="fileMeta hidden"></div>
-        </div>
+          <div class="bio-controls">
+            <label class="bio-label">Ölçü</label>
+            <select class="bio-size">
+              <option value="35x45" selected>35×45 mm</option>
+              <option value="50x60">50×60 mm</option>
+            </select>
 
-        <div class="result hidden">
-          <div class="thumbWrap">
-            <img class="thumb" alt="JPEG önizleme" />
+            <label class="bio-label">Beyazlatma</label>
+            <select class="bio-bg">
+              <option value="on" selected>Açık</option>
+              <option value="off">Kapalı</option>
+            </select>
           </div>
-          <div class="resultActions">
-            <a class="btn btn-ghost btnDownload" download>⏬ JPEG indir</a>
-          </div>
-        </div>
-      </section>
 
-      <section class="card" data-doc="saglik_raporu">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Sağlık Raporu</div>
-            <div class="card-desc">PDF yükle → JPEG üret</div>
-          </div>
-          <div class="card-tools">
-            <input class="fileInput" type="file" accept="application/pdf" hidden />
-            <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
-            <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
-          </div>
-        </div>
+          <div class="bio-split">
+            <!-- SOL: upload -->
+            <div class="bio-left">
+              <div class="dropzone bio-drop" tabindex="0" role="button" aria-label="Fotoğraf sürükle bırak">
+                <div class="dz-inner">
+                  <div class="dz-title">Fotoğrafı buraya sürükle-bırak</div>
+                  <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+                </div>
+                <div class="fileMeta hidden"></div>
+              </div>
+            </div>
 
-        <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
-          <div class="dz-inner">
-            <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
-            <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
-          </div>
-          <div class="fileMeta hidden"></div>
-        </div>
-
-        <div class="result hidden">
-          <div class="thumbWrap">
-            <img class="thumb" alt="JPEG önizleme" />
-          </div>
-          <div class="resultActions">
-            <a class="btn btn-ghost btnDownload" download>⏬ JPEG indir</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="card" data-doc="biyometrik_foto">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Biyometrik Foto</div>
-            <div class="card-desc">Arka plan beyaz + ölçülendir</div>
-          </div>
-          <div class="card-tools">
-            <input class="imgInput" type="file" accept="image/*" hidden />
-            <button class="iconBtn btnAddImg" title="Fotoğraf ekle">➕</button>
-            <button class="iconBtn btnClearImg" title="Temizle" disabled>✖</button>
-          </div>
-        </div>
-      
-        <div class="bio-controls">
-          <label class="bio-label">Ölçü</label>
-          <select class="bio-size">
-            <option value="35x45" selected>35×45 mm</option>
-            <option value="50x60">50×60 mm</option>
-          </select>
-      
-          <label class="bio-label">Beyazlatma</label>
-          <select class="bio-bg">
-            <option value="on" selected>Açık</option>
-            <option value="off">Kapalı</option>
-          </select>
-        </div>
-      
-        <div class="dropzone bio-drop" tabindex="0" role="button" aria-label="Fotoğraf sürükle bırak">
-          <div class="dz-inner">
-            <div class="dz-title">Fotoğrafı buraya sürükle-bırak</div>
-            <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
-          </div>
-          <div class="fileMeta hidden"></div>
-        </div>
-      
-        <div class="result hidden">
-          <div class="thumbWrap show placeholder">
-            <div class="pdfHolder">
-              <div class="pdfIcon">📷</div>
-              <div class="pdfName">Henüz fotoğraf yok</div>
-              <div class="pdfHint">Fotoğraf yükleyince önizleme burada çıkar</div>
+            <!-- SAĞ: output -->
+            <div class="bio-right">
+              <div class="result hidden">
+                <div class="thumbWrap show placeholder">
+                  <div class="pdfHolder">
+                    <div class="pdfIcon">📷</div>
+                    <div class="pdfName">Henüz fotoğraf yok</div>
+                    <div class="pdfHint">Dönüştürünce sağda önizleme çıkar</div>
+                  </div>
+                </div>
+                <div class="resultActions">
+                  <a class="btn btn-ghost btnDownloadBio is-disabled" role="button" aria-disabled="true">
+                    ⏬ Biyometrik JPEG indir
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="resultActions">
-            <a class="btn btn-ghost btnDownloadBio is-disabled" role="button" aria-disabled="true">⏬ Biyometrik JPEG indir</a>
+        </section>
+
+        <!-- ALT SATIR: 3 KART -->
+        <section class="card card-sabika" data-doc="sabika_kaydi">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Sabıka Kaydı</div>
+              <div class="card-desc">PDF yükle → JPEG üret</div>
+            </div>
+            <div class="card-tools">
+              <input class="fileInput" type="file" accept="application/pdf" hidden />
+              <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
+              <button class="iconBtn btnConvertOne" title="Bu kartı dönüştür" disabled>🔄</button>
+              <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
+            </div>
+            
           </div>
-        </div>
-      </section>
-      
-    </main>
+
+          <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
+            <div class="dz-inner">
+              <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
+              <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+            </div>
+            <div class="fileMeta hidden"></div>
+          </div>
+
+          <div class="result hidden">
+            <div class="thumbWrap">
+              <img class="thumb" alt="JPEG önizleme" />
+            </div>
+            <div class="resultActions">
+              <a class="btn btn-ghost btnDownload" download>⏬ JPEG indir</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="card card-saglik" data-doc="saglik_raporu">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Sağlık Raporu</div>
+              <div class="card-desc">PDF yükle → JPEG üret</div>
+            </div>
+            <div class="card-tools">
+              <input class="fileInput" type="file" accept="application/pdf" hidden />
+              <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
+              <button class="iconBtn btnConvertOne" title="Bu kartı dönüştür" disabled>🔄</button>
+              <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
+            </div>
+            
+          </div>
+
+          <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
+            <div class="dz-inner">
+              <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
+              <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+            </div>
+            <div class="fileMeta hidden"></div>
+          </div>
+
+          <div class="result hidden">
+            <div class="thumbWrap">
+              <img class="thumb" alt="JPEG önizleme" />
+            </div>
+            <div class="resultActions">
+              <a class="btn btn-ghost btnDownload" download>⏬ JPEG indir</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="card card-diploma" data-doc="diploma">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Diploma</div>
+              <div class="card-desc">PDF yükle → JPEG üret</div>
+            </div>
+            <div class="card-tools">
+              <input class="fileInput" type="file" accept="application/pdf" hidden />
+              <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
+              <button class="iconBtn btnConvertOne" title="Bu kartı dönüştür" disabled>🔄</button>
+              <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
+            </div>
+            
+          </div>
+
+          <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
+            <div class="dz-inner">
+              <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
+              <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+            </div>
+            <div class="fileMeta hidden"></div>
+          </div>
+
+          <div class="result hidden">
+            <div class="thumbWrap">
+              <img class="thumb" alt="JPEG önizleme" />
+            </div>
+            <div class="resultActions">
+              <a class="btn btn-ghost btnDownload" download>⏬ JPEG indir</a>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+    </div>
 
     <footer class="footer">
-      <div class="small">
-        İpucu: “Hepsini indir” için ZIP oluşturulur.
-      </div>
+      <div class="small">İpucu: “Hepsini indir” için ZIP oluşturulur.</div>
     </footer>
   </div>
 
- 
   <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"></script>
   <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
 
   <script src="app.js"></script>
-  
 </body>
 </html>

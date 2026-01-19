@@ -1,375 +1,547 @@
-/* ÖNCEKİ TÜM CSS'İ SİL VE BUNU YAPIŞTIR */
-
-/* Modern Font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-:root {
-  --bg-app: #09090b;       /* Daha derin siyah */
-  --bg-panel: #18181b;     /* Hafif açık panel */
-  --bg-card: #27272a;      /* Kartlar daha belirgin */
-  --bg-input: #121214;     /* Inputlar daha koyu */
-  
-  --accent: #6366f1;       /* Modern Indigo */
-  --accent-glow: rgba(99, 102, 241, 0.5);
-  --text-main: #f4f4f5;
-  --text-muted: #a1a1aa;
-  
-  --border: rgba(255,255,255,0.08);
-  --radius: 12px;
+:root{
+  --bg-app:#09090b;
+  --bg-panel:#18181b;
+  --bg-card:#27272a;
+  --bg-input:#121214;
+
+  --accent:#6366f1;
+  --accent-glow:rgba(99,102,241,.5);
+  --text-main:#f4f4f5;
+  --text-muted:#a1a1aa;
+
+  --border:rgba(255,255,255,.08);
+  --radius:12px;
 }
 
-* { box-sizing: border-box; }
+*{box-sizing:border-box;}
 
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif; /* Temiz font */
-  background-color: var(--bg-app);
-  color: var(--text-main);
-  /* Arka plana hafif, şık bir ızgara ve ışık efekti */
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15), transparent 40%),
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 100% 100%, 30px 30px, 30px 30px;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding-top: 40px;
+body{
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background-color:var(--bg-app);
+  color:var(--text-main);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(99,102,241,.15), transparent 40%),
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size:100% 100%, 30px 30px, 30px 30px;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:40px 0;
 }
 
-.app {
-  width: min(1100px, 95vw);
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.app{
+  width:min(1200px, 96vw);
+  display:flex;
+  flex-direction:column;
+  gap:18px;
 }
 
-/* Üst Bar */
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 10px;
+.mono{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
 }
 
-.brand { display: flex; align-items: center; gap: 12px; }
-.logo {
-  width: 40px; height: 40px;
-  background: var(--accent);
-  border-radius: 10px;
-  box-shadow: 0 0 15px var(--accent-glow);
+/* TOPBAR */
+.topbar{
+  display:flex;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid var(--border);
 }
-.title { font-weight: 700; font-size: 18px; }
-.subtitle { color: var(--text-muted); font-size: 13px; font-weight: 400; }
+.brand{display:flex;align-items:center;gap:12px;}
+.logo{
+  width:40px;height:40px;
+  background:var(--accent);
+  border-radius:10px;
+  box-shadow:0 0 15px var(--accent-glow);
+}
+.title{font-weight:800;font-size:18px;}
+.subtitle{color:var(--text-muted);font-size:13px;}
 
-.actions { display: flex; gap: 10px; }
+/* ANA LAYOUT */
+.layout{
+  display:grid;
+  grid-template-columns: 320px 1fr;
+  gap:20px;
+  align-items:start;
+}
+
+.sidebar{ position: sticky; top: 20px; align-self:start; }
+
+/* SOL KUTU */
+.side-card{
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.field label{
+  display:block;
+  font-size:12px;
+  color:var(--text-muted);
+  margin-bottom:8px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.field input{
+  width:100%;
+  padding:12px 14px;
+  background:var(--bg-input);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text-main);
+  outline:none;
+  transition:.2s;
+}
+.field input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(99,102,241,.15);
+}
+
+.side-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:4px;
+}
+
+.side-hint{
+  font-size:12px;
+  color:#c7d2fe;
+  background:rgba(99,102,241,.10);
+  border:1px solid rgba(99,102,241,.20);
+  padding:10px 12px;
+  border-radius:10px;
+}
+
+/* SAĞ GRID: 3 kolon
+   - bio: 1. satırda 3 kolonu kaplar
+   - altta 3 kart tek satır */
+.cardsGrid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:20px;
+  align-items:stretch;
+}
+
+/* BIYOMETRIK KART TAM SATIR */
+.card-bio{
+  grid-column: 1 / -1; /* <<< satırı komple kaplar */
+}
+
+/* Kartlar */
+.card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.card, .card *{ min-width:0; }
+
+.card-head{
+  padding:16px;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.02);
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.card-title{font-weight:800;font-size:15px;}
+.card-desc{font-size:12px;color:var(--text-muted);margin-top:4px;}
+.card-tools{display:flex;gap:8px;}
+
+.iconBtn{
+  border:1px solid var(--border);
+  background:rgba(0,0,0,.18);
+  color:var(--text-main);
+  width:34px;height:34px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:.2s;
+}
+.iconBtn:hover{background:rgba(255,255,255,.06);}
+.iconBtn:disabled{opacity:.5;cursor:not-allowed;}
 
 /* Butonlar */
-.btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: white;
-  font-weight: 500;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
+.btn{
+  padding:10px 14px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--bg-card);
+  color:#fff;
+  font-weight:700;
+  font-family:'Inter',sans-serif;
+  cursor:pointer;
+  transition:.2s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  width:100%;
+  justify-content:center;
 }
-.btn:hover { background: #3f3f46; }
+.btn:hover{background:#3f3f46;}
+.btn-primary{
+  background:var(--accent);
+  border-color:var(--accent);
+  box-shadow:0 6px 18px rgba(99,102,241,.28);
+}
+.btn-primary:hover{background:#4f46e5;}
+.btn-danger{
+  background:rgba(239,68,68,.12);
+  border-color:rgba(239,68,68,.28);
+}
+.btn-danger:hover{background:rgba(239,68,68,.18);}
+button:disabled{opacity:.55;cursor:not-allowed;}
 
-.btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-.btn-primary:hover {
-  background: #4f46e5;
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-}
-
-/* Input Alanı (Panel) */
-.panel {
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1.5fr; /* Ad, Soyad, Hint */
-  gap: 20px;
-  align-items: end;
-}
-
-.field label {
-  display: block;
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.btn.is-disabled{
+  opacity:.5;
+  cursor:not-allowed;
+  filter:grayscale(1);
+  pointer-events:auto;
 }
 
-.field input {
-  width: 100%;
-  padding: 12px 16px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: white;
-  font-family: 'Inter', sans-serif;
-  outline: none;
-  transition: 0.2s;
-}
-
-.field input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-}
-
-/* Sağdaki Bilgi Kutusu */
-.hint {
-  font-size: 13px;
-  color: #c7d2fe;
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  padding: 12px 16px;
-  border-radius: 8px;
-  height: 44px; /* Input yüksekliğiyle eşitle */
-  display: flex;
-  align-items: center;
-}
-
-/* Kartlar Grid */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.card-head {
-  padding: 16px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.card-title { font-weight: 600; font-size: 15px; }
-.card-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-
-/* Dropzone (Sürükle Bırak Alanı) */
-.dropzone {
-  margin: 16px;
-  height: 140px;
-  border: 2px dashed rgba(255,255,255,0.15);
-  border-radius: 8px;
-  background: rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.2s;
-  color: var(--text-muted);
-  font-size: 13px;
-  padding: 10px;
-}
-
-.dropzone:hover {
-  border-color: var(--accent);
-  background: rgba(99, 102, 241, 0.05);
-  color: var(--text-main);
-}
-
-/* KIRIK RESİM DÜZELTMESİ */
-/* Resim yüklenmediyse alanı gizle veya şık göster */
-.thumbWrap {
-  margin: 0 16px 16px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #000;
-  display: none; /* Varsayılan olarak gizli, JS ile açmalısın */
-}
-
-/* Eğer JS ile aç-kapa yapmıyorsan, boş img etiketlerini gizle: */
-img[src=""], img:not([src]) {
-  display: none;
-}
-
-/* Yüklenmiş resim varsa wrapper görünür olsun (bunu JS ile 'show' classı ekleyerek yapman lazım) */
-.thumbWrap.show {
-  display: block;
-  border: 1px solid var(--border);
-}
-
-.thumb {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.resultActions {
-  padding: 12px 16px;
-  background: rgba(0,0,0,0.2);
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: flex-end;
-}
-
-.footer {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 12px;
-  padding-bottom: 20px;
-}
-
-/* Küçük ekran ayarı */
-@media (max-width: 800px) {
-  .grid { grid-template-columns: 1fr; }
-  .row { grid-template-columns: 1fr; }
-}
-/* --- DURUM ÇUBUĞU --- */
-.statusRow {
-  margin: 0 16px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-/* Badge (Etiketler) - Daha zarif ve neon etkili */
-.badge {
-  padding: 4px 10px;
-  border-radius: 6px; /* Tam yuvarlak yerine hafif köşeli modern yapı */
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-/* Bekleme Modu (Indigo) */
-.badge-ready {
-  border-color: rgba(99, 102, 241, 0.25);
-  background: rgba(99, 102, 241, 0.1);
-  color: #a5b4fc; /* Soft Indigo */
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.05); /* Hafif Glow */
-}
-
-/* Başarılı Modu (Emerald Green - Daha modern yeşil) */
-.badge-ok {
-  border-color: rgba(16, 185, 129, 0.25);
-  background: rgba(16, 185, 129, 0.1);
-  color: #6ee7b7;
-}
-
-/* --- BUTON DURUMLARI --- */
-.btn.is-disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(1); /* Rengi soldurur */
-  pointer-events: auto; /* Tıklayınca uyarı verdirmek istersen açık kalsın */
-}
-
-/* --- PDF PLACEHOLDER (Dosya Yüklendiğinde Görünecek Alan) --- */
-
-/* Varsayılan thumbWrap ayarlarını ezmek için */
-.thumbWrap.placeholder {
-  display: flex !important; /* Görünür yap */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.2); /* İçeri gömük koyu zemin */
-  border: 1px solid var(--border); /* Kesik çizgi yerine düz zarif çizgi */
-  border-radius: 8px;
-  margin: 0 16px 16px;
-  height: 200px; /* Sabit yükseklik, düzen bozulmaz */
-  transition: border-color 0.2s;
-}
-
-/* Hover durumunda hafif tepki */
-.thumbWrap.placeholder:hover {
-  border-color: rgba(255,255,255,0.15);
-}
-
-.pdfHolder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  text-align: center;
-  padding: 20px;
-  width: 100%;
-}
-
-.pdfIcon {
-  width: 48px; height: 48px;
-  border-radius: 12px;
-  /* Icon için cam efekti */
-  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-  border: 1px solid rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  color: #e2e8f0;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-.pdfName {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-main);
-  max-width: 90%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pdfHint {
-  font-size: 11px;
-  color: var(--text-muted);
-  background: rgba(255,255,255,0.05);
-  padding: 4px 8px;
-  border-radius: 4px;
-}
+/* BIO controls */
 .bio-controls{
   display:flex;
   gap:10px;
   align-items:center;
-  padding: 12px 16px 0;
-  color: var(--text-muted);
-  font-size: 12px;
+  padding:12px 16px 0;
+  color:var(--text-muted);
+  font-size:12px;
+  flex-wrap:wrap;
 }
-.bio-label{ opacity:.9; text-transform: uppercase; letter-spacing:.4px; font-weight:600; }
-.bio-size, .bio-bg{
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  color: var(--text-main);
-  border-radius: 8px;
-  padding: 8px 10px;
-  outline: none;
+.bio-label{opacity:.9;text-transform:uppercase;letter-spacing:.4px;font-weight:800;}
+.bio-size,.bio-bg{
+  background:var(--bg-input);
+  border:1px solid var(--border);
+  color:var(--text-main);
+  border-radius:10px;
+  padding:8px 10px;
+  outline:none;
 }
 
+/* BIO iç layout: sol upload / sağ çıktı */
+.bio-split{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:16px;
+  padding:16px;
+  padding-top:12px;
+}
+
+/* Bio: sol taraf */
+.bio-left .dropzone{
+  margin:0;
+  height:160px;
+  min-height:160px;
+}
+
+/* Bio: sağ taraf (çıktı) */
+.bio-right .result{
+  display:block;
+}
+.bio-right .thumbWrap,
+.bio-right .thumbWrap.placeholder{
+  margin:0 0 12px;
+  height:160px;
+}
+.bio-right .resultActions{
+  padding:0;
+  background:transparent;
+  border-top:none;
+  justify-content:flex-start;
+}
+.bio-right .btn{
+  width:auto;
+  padding:10px 12px;
+}
+
+/* Dropzone (genel) + çakışma fix */
+.dropzone{
+  position:relative;
+  margin:16px;
+  height:140px;
+  min-height:140px;
+  border:2px dashed rgba(255,255,255,.15);
+  border-radius:12px;
+  background:rgba(0,0,0,.20);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  transition:.2s;
+  color:var(--text-muted);
+  font-size:13px;
+  padding:14px;
+  overflow:hidden;
+}
+
+.dropzone .dz-inner{
+  max-width:90%;
+  line-height:1.25;
+  white-space:normal;
+  word-break:break-word;
+}
+.dropzone .dz-title{font-weight:800;font-size:13px;}
+.dropzone .dz-sub{margin-top:6px;font-size:12px;opacity:.85;}
+
+.dropzone:hover{
+  border-color:var(--accent);
+  background:rgba(99,102,241,.06);
+  color:var(--text-main);
+}
+.dropzone.dragover{
+  border-color:var(--accent);
+  background:rgba(99,102,241,.10);
+}
+
+.dropzone .fileMeta{
+  width:100%;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  border-radius:10px;
+  background:rgba(0,0,0,.22);
+  border:1px solid rgba(255,255,255,.08);
+}
+.dropzone .fileMeta > div{ min-width:0; }
+.dropzone .fileMeta .badge{ white-space:nowrap; }
+
+.dropzone .dz-inner.hidden{ display:none !important; }
+.dropzone .fileMeta.hidden{ display:none !important; }
+
+/* Result (PDF kartlar) */
+.resultActions{
+  padding:12px 16px;
+  background:rgba(0,0,0,.20);
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:flex-end;
+}
+
+.thumbWrap{
+  margin:0 16px 16px;
+  border-radius:12px;
+  overflow:hidden;
+  background:#000;
+  display:none;
+}
+img[src=""],img:not([src]){display:none;}
+.thumbWrap.show{display:block;border:1px solid var(--border);}
+.thumb{width:100%;height:auto;display:block;}
+
+.thumbWrap.placeholder{
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.20);
+  border:1px solid var(--border);
+  border-radius:12px;
+  margin:0 16px 16px;
+  height:180px;
+}
+
+.pdfHolder{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  text-align:center;
+  padding:18px;
+  width:100%;
+}
+
+.pdfIcon{
+  width:48px;height:48px;
+  border-radius:12px;
+  background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.10);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  color:#e2e8f0;
+  box-shadow:0 4px 10px rgba(0,0,0,.2);
+}
+
+.pdfName{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text-main);
+  max-width:90%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.pdfHint{
+  font-size:11px;
+  color:var(--text-muted);
+  background:rgba(255,255,255,.05);
+  padding:4px 8px;
+  border-radius:8px;
+}
+
+/* Status */
+.statusRow{
+  margin:0 16px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--text-muted);
+}
+.badge{
+  padding:4px 10px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:var(--text-muted);
+  font-size:11px;
+  font-weight:800;
+  text-transform:uppercase;
+}
+.badge-ready{
+  border-color:rgba(99,102,241,.25);
+  background:rgba(99,102,241,.10);
+  color:#a5b4fc;
+}
+.badge-ok{
+  border-color:rgba(16,185,129,.25);
+  background:rgba(16,185,129,.10);
+  color:#6ee7b7;
+}
+
+/* Footer */
+.footer{
+  text-align:center;
+  color:var(--text-muted);
+  font-size:12px;
+  padding-bottom:20px;
+}
+
+/* Responsive */
+@media (max-width: 1100px){
+  .layout{ grid-template-columns: 1fr; }
+  .sidebar{ position: static; }
+  .cardsGrid{ grid-template-columns: 1fr; }
+  .card-bio{ grid-column: auto; }
+  .bio-split{ grid-template-columns: 1fr; }
+  .bio-right .btn{ width:100%; }
+}
+/* BIO sağ önizleme kutusunu tam doldur */
+.bio-right .thumbWrap{
+  height: 210px;          /* istersen 190-260 arası oynat */
+  background: #0b0b0f;
+}
+
+.bio-right .thumbWrap .thumb{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;      /* tam doldursun (cropping olabilir) */
+  display: block;
+}
+
+/* cropping istemiyorsan cover yerine contain yap:
+.bio-right .thumbWrap .thumb{ object-fit: contain; background:#fff; }
+*/
+
+/* küçük ikon butonlar biraz daha net olsun */
+.iconBtn{
+  font-weight: 800;
+}
+/* BIO sağ önizleme: crop yok, fotoğrafın tamamı görünsün */
+.bio-right .thumbWrap{
+  height: 210px;           /* istersen 180-260 arası */
+  background: #ffffff;     /* biyometrik için temiz zemin */
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.bio-right .thumbWrap .thumb{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;     /* TAMAMI GÖRÜNSÜN */
+  display: block;
+  background: #ffffff;     /* boş alanlar beyaz kalsın */
+}
+/* =========================
+   BIYOMETRIK: sağ önizleme
+   - Yokken tamamen gizli
+   - Varken sadece foto kadar
+   ========================= */
+
+   .card[data-doc="biyometrik_foto"] .result {
+    /* sağ önizleme + indir butonu bloğu */
+    display: none; /* başlangıçta gizli kalsın */
+  }
+  
+  /* JS çıktı üretince .result.hidden kalkıyor -> o zaman göster */
+  .card[data-doc="biyometrik_foto"] .result:not(.hidden) {
+    display: block;
+  }
+  
+  /* Sağ önizleme kutusu: artık "dev pano" değil */
+  .card[data-doc="biyometrik_foto"] .thumbWrap {
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    height: auto;     /* kritik */
+    padding: 0;       /* kritik */
+    display: block;
+  }
+  
+  /* Fotoğrafın kendisi kadar görünsün (yanlara uzamasın) */
+  .card[data-doc="biyometrik_foto"] .thumbWrap .thumb {
+    display: block;
+    width: auto;          /* kritik */
+    height: auto;         /* kritik */
+    max-width: 360px;     /* sağ alanda taşmasın */
+    max-height: 310px;    /* çok büyümesin */
+    object-fit: contain;
+    background: transparent;
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.35);
+    margin-left: 70px;
+  }
+  
+  /* Biyometrik kart içinde sağ taraf hizalama: görsel ortalı dursun */
+  .card[data-doc="biyometrik_foto"] .resultActions {
+    justify-content: flex-start; /* buton solda kalsın */
+    gap: 10px;
+    padding: 10px 0 0;
+    background: transparent;
+    border-top: none;
+  }
+  
+  /* Biyometrik kartta thumbWrap'ın "placeholder" görünmesini tamamen engelle */
+  .card[data-doc="biyometrik_foto"] .thumbWrap.placeholder {
+    display: none !important;
+  }
+  /* Biyometrik indir butonunu sağa al */
+.card[data-doc="biyometrik_foto"] .resultActions {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 110px; /* ne kadar sağa gitsin istiyorsan */
+}
+
+  

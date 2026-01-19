@@ -27,7 +27,13 @@ function sanitizeNamePart(s) {
     .replace(/[^a-zA-Z0-9_\-çğıöşüÇĞİÖŞÜ]/g, "");
 }
 
-function canConvert() {
+function hasName() {
+  const fn = sanitizeNamePart($("#firstName")?.value);
+  const ln = sanitizeNamePart($("#lastName")?.value);
+  return Boolean(fn && ln);
+}
+
+function canConvertAny() {
   return Object.values(state.files).some(Boolean);
 }
 
@@ -36,19 +42,39 @@ function updateTopButtons() {
   const btnDownloadAll = $("#btnDownloadAll");
   const btnClearAll = $("#btnClearAll");
 
-  const hasFiles = canConvert();
+  const hasFiles = canConvertAny();
+  const anyOut = Object.values(state.outputs).some(Boolean);
 
   if (btnConvert) btnConvert.disabled = !hasFiles;
 
-  const anyOut = Object.values(state.outputs).some(Boolean);
   if (btnDownloadAll) btnDownloadAll.disabled = !anyOut;
 
-  // Dosya yüklüyse, çıktı varsa VEYA isim girildiyse "Temizle" butonu aktif olsun
   if (btnClearAll) {
-    const hasText = ($("#firstName").value || "").trim().length > 0 ||
-                    ($("#lastName").value || "").trim().length > 0;
+    const hasText =
+      ($("#firstName")?.value || "").trim().length > 0 ||
+      ($("#lastName")?.value || "").trim().length > 0;
+
     btnClearAll.disabled = !(hasFiles || hasText || anyOut);
   }
+
+  // Kart içi dönüştür butonlarını güncelle
+  updatePerCardConvertButtons();
+}
+
+function updatePerCardConvertButtons() {
+  const fnOk = hasName();
+
+  $$(".card").forEach((card) => {
+    const key = card.dataset.doc;
+
+    if (key === "biyometrik_foto") {
+      const btn = $(".btnConvertBio", card);
+      if (btn) btn.disabled = !(fnOk && state.files.biyometrik_foto);
+    } else {
+      const btn = $(".btnConvertOne", card);
+      if (btn) btn.disabled = !(fnOk && state.files[key]);
+    }
+  });
 }
 
 function formatBytes(bytes) {
@@ -60,15 +86,9 @@ function formatBytes(bytes) {
 }
 
 // ===================== DRAG & DROP NAME HELPER =====================
-/**
- * Resmi masaüstüne sürükleyince ismin doğru gelmesini sağlayan fonksiyon.
- * (Chrome/Edge gibi Chromium tabanlı tarayıcılarda çalışır)
- */
 function enableDragToSave(imgElement, url, filename) {
-  // ondragstart kullanıyoruz ki her seferinde listener ekleyip şişirmeyelim
   imgElement.ondragstart = (e) => {
     if (url && filename) {
-      // Format: MIME_TYPE:FILENAME:URL
       e.dataTransfer.setData("DownloadURL", `image/jpeg:${filename}:${url}`);
     }
   };
@@ -216,6 +236,95 @@ async function makeBiometricJpeg(file, sizeStr, doWhiten) {
   return blob;
 }
 
+// ===================== FILENAME HELPERS =====================
+function buildFilename(docKey) {
+  const fn = sanitizeNamePart($("#firstName").value);
+  const ln = sanitizeNamePart($("#lastName").value);
+  return `${fn}_${ln}_${docKey}.jpeg`;
+}
+
+function buildBioFilename(sizeStr) {
+  const fn = sanitizeNamePart($("#firstName").value);
+  const ln = sanitizeNamePart($("#lastName").value);
+  return `${fn}_${ln}_biyometrik_${sizeStr}.jpeg`;
+}
+
+// ===================== SINGLE CARD CONVERT =====================
+async function convertOneCard(card) {
+  const firstName = sanitizeNamePart($("#firstName").value);
+  const lastName = sanitizeNamePart($("#lastName").value);
+
+  if (!firstName || !lastName) {
+    alert("Lütfen önce AD ve SOYAD bilgisini giriniz.");
+    return;
+  }
+
+  if (!card?.__getKey || !card?.__setOutput) return;
+
+  const key = card.__getKey();
+  const file = state.files[key];
+  if (!file) {
+    alert("Önce dosya yüklemelisin.");
+    return;
+  }
+
+  // Kart içi butonu loading yap
+  const localBtn = (key === "biyometrik_foto") ? $(".btnConvertBio", card) : $(".btnConvertOne", card);
+  const oldTxt = localBtn?.textContent;
+  if (localBtn) {
+    localBtn.disabled = true;
+    localBtn.textContent = "⏳";
+  }
+
+  try {
+    if (key === "biyometrik_foto") {
+      const sizeStr = $(".bio-size", card)?.value || "35x45";
+      const doWhiten = ($(".bio-bg", card)?.value || "on") === "on";
+
+      let jpegBlob = null;
+      try {
+        jpegBlob = await makeBiometricJpeg(file, sizeStr, doWhiten);
+      } catch (e) {
+        console.error(e);
+        alert("Biyometrik beyazlatma için MediaPipe script'i ekli mi? (index.html)");
+        return;
+      }
+
+      const url = URL.createObjectURL(jpegBlob);
+      const filename = buildBioFilename(sizeStr);
+
+      if (state.outputs[key]?.url) URL.revokeObjectURL(state.outputs[key].url);
+      state.outputs[key] = { blob: jpegBlob, url, filename };
+
+      card.__setOutput(state.outputs[key]);
+      return;
+    }
+
+    // PDF -> JPEG
+    const jpegBlob = await renderPdfFirstPageToJpegBlob(file, 0.92, 2.0);
+    if (!jpegBlob) {
+      alert(`JPEG oluşturulamadı: ${key}`);
+      return;
+    }
+
+    const url = URL.createObjectURL(jpegBlob);
+    const filename = buildFilename(key);
+
+    if (state.outputs[key]?.url) URL.revokeObjectURL(state.outputs[key].url);
+    state.outputs[key] = { blob: jpegBlob, url, filename };
+
+    card.__setOutput(state.outputs[key]);
+  } catch (err) {
+    console.error(err);
+    alert("Dönüştürme sırasında bir hata oluştu. Konsolu (F12) kontrol edin.");
+  } finally {
+    if (localBtn) {
+      localBtn.textContent = oldTxt || "🔄";
+    }
+    updateTopButtons();
+  }
+}
+
 // ===================== PDF CARD LOGIC =====================
 function attachCardLogic(card) {
   const docKey = card.dataset.doc;
@@ -227,6 +336,7 @@ function attachCardLogic(card) {
   const dzInner = $(".dz-inner", card);
 
   const btnAdd = $(".btnAdd", card);
+  const btnConvertOne = $(".btnConvertOne", card);
   const btnClear = $(".btnClear", card);
 
   const result = $(".result", card);
@@ -234,13 +344,13 @@ function attachCardLogic(card) {
   const thumb = $(".thumb", card);
   const btnDownload = $(".btnDownload", card);
 
-  // Eksik element kontrolü
   const missing = [];
   if (!fileInput) missing.push("fileInput");
   if (!dropzone) missing.push("dropzone");
   if (!meta) missing.push("meta");
   if (!dzInner) missing.push("dzInner");
   if (!btnAdd) missing.push("btnAdd");
+  if (!btnConvertOne) missing.push("btnConvertOne");
   if (!btnClear) missing.push("btnClear");
   if (!result) missing.push("result");
   if (!thumbWrap) missing.push("thumbWrap");
@@ -252,7 +362,6 @@ function attachCardLogic(card) {
     return;
   }
 
-  // Durum satırı
   let statusHost = $(".statusRow", card);
   if (!statusHost) {
     statusHost = document.createElement("div");
@@ -301,7 +410,7 @@ function attachCardLogic(card) {
       <div class="pdfHolder">
         <div class="pdfIcon">📄</div>
         <div class="pdfName" title="${file.name}">${file.name}</div>
-        <div class="pdfHint">Dönüştürmek için üstten 🔄 Dönüştür</div>
+        <div class="pdfHint">Bu kart için üstten 🔄 (kart içi) veya soldan 🔄 Dönüştür</div>
       </div>
     `;
   }
@@ -318,7 +427,6 @@ function attachCardLogic(card) {
     thumb.removeAttribute("src");
     thumb.src = out.url;
 
-    // --- SÜRÜKLE BIRAK İLE İSİMLENDİRME ---
     enableDragToSave(thumb, out.url, out.filename);
   }
 
@@ -359,6 +467,7 @@ function attachCardLogic(card) {
     thumb.removeAttribute("src");
 
     btnClear.disabled = true;
+    btnConvertOne.disabled = true;
 
     statusBadge.className = "badge";
     statusBadge.textContent = "Henüz PDF yüklenmedi";
@@ -391,6 +500,9 @@ function attachCardLogic(card) {
   btnAdd.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", (e) => setFile(e.target.files?.[0]));
   btnClear.addEventListener("click", clearAll);
+
+  // Kart içi dönüştür
+  btnConvertOne.addEventListener("click", () => convertOneCard(card));
 
   dropzone.addEventListener("click", () => fileInput.click());
   dropzone.addEventListener("keydown", (e) => {
@@ -438,6 +550,7 @@ function attachBioLogic(card) {
 
   const imgInput = $(".imgInput", card);
   const btnAdd = $(".btnAddImg", card);
+  const btnConvertBio = $(".btnConvertBio", card);
   const btnClear = $(".btnClearImg", card);
 
   const dropzone = $(".bio-drop", card);
@@ -448,7 +561,7 @@ function attachBioLogic(card) {
   const thumbWrap = $(".thumbWrap", card);
   const btnDownload = $(".btnDownloadBio", card);
 
-  if (!imgInput || !btnAdd || !btnClear || !dropzone || !meta || !dzInner || !result || !thumbWrap || !btnDownload) {
+  if (!imgInput || !btnAdd || !btnConvertBio || !btnClear || !dropzone || !meta || !dzInner || !result || !thumbWrap || !btnDownload) {
     console.error("Biyometrik kartında eksik element var.");
     return;
   }
@@ -499,7 +612,7 @@ function attachBioLogic(card) {
       <div class="pdfHolder">
         <div class="pdfIcon">📷</div>
         <div class="pdfName" title="${nameText || ""}">${nameText || "Fotoğraf yüklendi"}</div>
-        <div class="pdfHint">Biyometrik JPEG için üstten 🔄 Dönüştür</div>
+        <div class="pdfHint">Bu kart için üstten 🔄 (kart içi) veya soldan 🔄 Dönüştür</div>
       </div>
     `;
   }
@@ -555,6 +668,8 @@ function attachBioLogic(card) {
     dzInner.classList.remove("hidden");
 
     btnClear.disabled = true;
+    btnConvertBio.disabled = true;
+
     lockDownload();
 
     result.classList.add("hidden");
@@ -594,6 +709,9 @@ function attachBioLogic(card) {
   imgInput.addEventListener("change", (e) => setFile(e.target.files?.[0]));
   btnClear.addEventListener("click", clearAll);
 
+  // Kart içi dönüştür
+  btnConvertBio.addEventListener("click", () => convertOneCard(card));
+
   card.__getKey = () => docKey;
   card.__setOutput = (out) => {
     if (!out) return;
@@ -611,7 +729,6 @@ function attachBioLogic(card) {
     img.src = out.url;
     thumbWrap.appendChild(img);
 
-    // --- SÜRÜKLE BIRAK İLE İSİMLENDİRME ---
     enableDragToSave(img, out.url, out.filename);
 
     unlockDownload(out);
@@ -626,14 +743,7 @@ function attachBioLogic(card) {
   card.__clear = clearAll;
 }
 
-// ===================== FILENAME HELPERS =====================
-function buildFilename(docKey) {
-  const fn = sanitizeNamePart($("#firstName").value);
-  const ln = sanitizeNamePart($("#lastName").value);
-  return `${fn}_${ln}_${docKey}.jpeg`;
-}
-
-// ===================== CONVERT ALL =====================
+// ===================== CONVERT ALL (SOL BUTON) =====================
 async function convertAll() {
   const firstName = sanitizeNamePart($("#firstName").value);
   const lastName = sanitizeNamePart($("#lastName").value);
@@ -645,62 +755,25 @@ async function convertAll() {
 
   const convertBtn = $("#btnConvert");
   convertBtn.disabled = true;
+  const oldText = convertBtn.textContent;
   convertBtn.textContent = "🔄 Dönüştürülüyor...";
 
   try {
     const cards = $$(".card");
-
     for (const card of cards) {
       if (!card.__getKey || !card.__setOutput) continue;
-
       const key = card.__getKey();
       const file = state.files[key];
       if (!file) continue;
 
-      // Biyometrik
-      if (key === "biyometrik_foto") {
-        const sizeStr = $(".bio-size", card)?.value || "35x45";
-        const doWhiten = ($(".bio-bg", card)?.value || "on") === "on";
-
-        let jpegBlob = null;
-        try {
-          jpegBlob = await makeBiometricJpeg(file, sizeStr, doWhiten);
-        } catch (e) {
-          console.error(e);
-          alert("Biyometrik beyazlatma için MediaPipe script'i ekli mi? (index.html)");
-          continue;
-        }
-
-        const url = URL.createObjectURL(jpegBlob);
-        const filename = `${firstName}_${lastName}_biyometrik_${sizeStr}.jpeg`;
-
-        if (state.outputs[key]?.url) URL.revokeObjectURL(state.outputs[key].url);
-        state.outputs[key] = { blob: jpegBlob, url, filename };
-
-        card.__setOutput(state.outputs[key]);
-        continue;
-      }
-
-      // PDF -> JPEG
-      const jpegBlob = await renderPdfFirstPageToJpegBlob(file, 0.92, 2.0);
-      if (!jpegBlob) {
-        alert(`JPEG oluşturulamadı: ${key}`);
-        continue;
-      }
-
-      const url = URL.createObjectURL(jpegBlob);
-      const filename = buildFilename(key);
-
-      if (state.outputs[key]?.url) URL.revokeObjectURL(state.outputs[key].url);
-      state.outputs[key] = { blob: jpegBlob, url, filename };
-
-      card.__setOutput(state.outputs[key]);
+      // tek kart dönüştür fonksiyonunu kullan
+      await convertOneCard(card);
     }
   } catch (err) {
     console.error(err);
     alert("Dönüştürme sırasında bir hata oluştu. Konsolu (F12) kontrol edin.");
   } finally {
-    convertBtn.textContent = "🔄 Dönüştür";
+    convertBtn.textContent = oldText || "🔄 Dönüştür";
     updateTopButtons();
   }
 }
@@ -764,20 +837,16 @@ function wireUp() {
   const fnInput = $("#firstName");
   const lnInput = $("#lastName");
 
-  if(fnInput) {
-    ["input", "change"].forEach(evt => fnInput.addEventListener(evt, updateTopButtons));
-  }
-  if(lnInput) {
-    ["input", "change"].forEach(evt => lnInput.addEventListener(evt, updateTopButtons));
-  }
+  if (fnInput) ["input", "change"].forEach(evt => fnInput.addEventListener(evt, updateTopButtons));
+  if (lnInput) ["input", "change"].forEach(evt => lnInput.addEventListener(evt, updateTopButtons));
 
   const btnConvert = $("#btnConvert");
   const btnDownloadAll = $("#btnDownloadAll");
   const btnClearAll = $("#btnClearAll");
 
-  if(btnConvert) btnConvert.addEventListener("click", convertAll);
-  if(btnDownloadAll) btnDownloadAll.addEventListener("click", downloadAllZip);
-  if(btnClearAll) btnClearAll.addEventListener("click", clearEverything);
+  if (btnConvert) btnConvert.addEventListener("click", convertAll);
+  if (btnDownloadAll) btnDownloadAll.addEventListener("click", downloadAllZip);
+  if (btnClearAll) btnClearAll.addEventListener("click", clearEverything);
 
   updateTopButtons();
 }
