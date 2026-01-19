@@ -270,10 +270,13 @@ async function convertOneCard(card) {
 
   // Kart içi butonu loading yap
   const localBtn = (key === "biyometrik_foto") ? $(".btnConvertBio", card) : $(".btnConvertOne", card);
-  const oldTxt = localBtn?.textContent;
+  
+  // ÖNEMLİ DEĞİŞİKLİK: textContent yerine innerHTML kullanıyoruz ki ikon yapısı kaybolmasın
+  const oldHtml = localBtn?.innerHTML; 
+  
   if (localBtn) {
     localBtn.disabled = true;
-    localBtn.textContent = "⏳";
+    localBtn.innerHTML = "⏳"; // Yükleniyor ikonu
   }
 
   try {
@@ -319,9 +322,13 @@ async function convertOneCard(card) {
     alert("Dönüştürme sırasında bir hata oluştu. Konsolu (F12) kontrol edin.");
   } finally {
     if (localBtn) {
-      localBtn.textContent = oldTxt || "🔄";
+        // İkonlu orijinal HTML yapısını geri yüklüyoruz
+        localBtn.innerHTML = oldHtml || '<i data-lucide="refresh-cw"></i>';
     }
     updateTopButtons();
+    
+    // ÖNEMLİ: İkonları tekrar oluştur (Böylece kaybolmazlar)
+    lucide.createIcons();
   }
 }
 
@@ -755,8 +762,11 @@ async function convertAll() {
 
   const convertBtn = $("#btnConvert");
   convertBtn.disabled = true;
-  const oldText = convertBtn.textContent;
-  convertBtn.textContent = "🔄 Dönüştürülüyor...";
+  
+  // ÖNEMLİ: textContent yerine innerHTML kaydediyoruz
+  const oldHtml = convertBtn.innerHTML;
+  
+  convertBtn.innerHTML = "🔄 Dönüştürülüyor...";
 
   try {
     const cards = $$(".card");
@@ -773,8 +783,12 @@ async function convertAll() {
     console.error(err);
     alert("Dönüştürme sırasında bir hata oluştu. Konsolu (F12) kontrol edin.");
   } finally {
-    convertBtn.textContent = oldText || "🔄 Dönüştür";
+    // HTML yapısını geri yükle
+    convertBtn.innerHTML = oldHtml || ' <span class="ico"><i data-lucide="sparkles"></i></span> Dönüştür';
     updateTopButtons();
+    
+    // ÖNEMLİ: İkonları tekrar oluştur
+    lucide.createIcons();
   }
 }
 
@@ -852,3 +866,12 @@ function wireUp() {
 }
 
 window.addEventListener("DOMContentLoaded", wireUp);
+lucide.createIcons();
+
+
+
+
+
+
+
+

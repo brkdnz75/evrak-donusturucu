@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Evrak Dönüştürücü</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <div class="app">
@@ -21,7 +22,6 @@
 
     <div class="layout">
 
-      <!-- SOL: AD / SOYAD + BUTONLAR -->
       <aside class="sidebar">
         <div class="side-card">
           <div class="field">
@@ -35,9 +35,33 @@
           </div>
 
           <div class="side-actions">
-            <button id="btnConvert" class="btn btn-primary" disabled>🔄 Dönüştür</button>
-            <button id="btnDownloadAll" class="btn" disabled>⏬ Hepsini indir</button>
-            <button id="btnClearAll" class="btn btn-danger" disabled>🗑️ Temizle</button>
+            <button id="btnConvert" class="btn btn-primary" disabled title="PDF → JPEG">
+
+              <span class="ico"><i data-lucide="sparkles"></i></span>
+
+              Dönüştür
+
+            </button>
+
+
+
+            <button id="btnDownloadAll" class="btn" disabled title="Hepsini indir">
+
+              <span class="ico"><i data-lucide="download"></i></span>
+
+              Hepsini indir
+
+            </button>
+
+
+
+            <button id="btnClearAll" class="btn btn-danger" disabled title="Tüm alanları temizle">
+
+              <span class="ico"><i data-lucide="trash-2"></i></span>
+
+              Temizle
+
+            </button>
           </div>
 
           <div class="side-hint">
@@ -46,10 +70,8 @@
         </div>
       </aside>
 
-      <!-- SAĞ: GRID -->
       <main class="cardsGrid">
 
-        <!-- BIOMETRIK: ÜST SATIRI KOMPLE KAPLAR, İÇİ 2 KOLON (SOL upload / SAĞ çıktı) -->
         <section class="card card-bio" data-doc="biyometrik_foto">
           <div class="card-head">
             <div>
@@ -58,9 +80,15 @@
             </div>
             <div class="card-tools">
               <input class="imgInput" type="file" accept="image/*" hidden />
-              <button class="iconBtn btnAddImg" title="Fotoğraf ekle">➕</button>
-              <button class="iconBtn btnConvertBio" title="Bu kartı dönüştür" disabled>🔄</button>
-              <button class="iconBtn btnClearImg" title="Temizle" disabled>✖</button>
+              <button class="iconBtn btnAddImg" title="Fotoğraf ekle">
+                <i data-lucide="plus"></i>
+              </button>
+              <button class="iconBtn btnConvertBio" title="Bu kartı dönüştür" disabled>
+                <i data-lucide="refresh-cw"></i>
+              </button>
+              <button class="iconBtn btnClearImg" title="Temizle" disabled>
+                <i data-lucide="x"></i>
+              </button>
             </div>
             
           </div>
@@ -80,18 +108,16 @@
           </div>
 
           <div class="bio-split">
-            <!-- SOL: upload -->
             <div class="bio-left">
               <div class="dropzone bio-drop" tabindex="0" role="button" aria-label="Fotoğraf sürükle bırak">
                 <div class="dz-inner">
                   <div class="dz-title">Fotoğrafı buraya sürükle-bırak</div>
-                  <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+                  <div class="dz-sub">veya sağ üstten <b><i data-lucide="plus" style="width:14px; height:14px; display:inline-block; vertical-align:middle;"></i></b> ile seç</div>
                 </div>
                 <div class="fileMeta hidden"></div>
               </div>
             </div>
 
-            <!-- SAĞ: output -->
             <div class="bio-right">
               <div class="result hidden">
                 <div class="thumbWrap show placeholder">
@@ -111,7 +137,6 @@
           </div>
         </section>
 
-        <!-- ALT SATIR: 3 KART -->
         <section class="card card-sabika" data-doc="sabika_kaydi">
           <div class="card-head">
             <div>
@@ -120,9 +145,15 @@
             </div>
             <div class="card-tools">
               <input class="fileInput" type="file" accept="application/pdf" hidden />
-              <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
-              <button class="iconBtn btnConvertOne" title="Bu kartı dönüştür" disabled>🔄</button>
-              <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
+              <button class="iconBtn btnAdd" title="PDF ekle">
+                <i data-lucide="plus"></i>
+              </button>
+              <button class="iconBtn btnConvertOne" title="Bu kartı dönüştür" disabled>
+                <i data-lucide="refresh-cw"></i>
+              </button>
+              <button class="iconBtn btnClear" title="Temizle" disabled>
+                <i data-lucide="x"></i>
+              </button>
             </div>
             
           </div>
@@ -130,7 +161,7 @@
           <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
             <div class="dz-inner">
               <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
-              <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+              <div class="dz-sub">veya sağ üstten <b><i data-lucide="plus" style="width:14px; height:14px; display:inline-block; vertical-align:middle;"></i></b> ile seç</div>
             </div>
             <div class="fileMeta hidden"></div>
           </div>
@@ -153,9 +184,15 @@
             </div>
             <div class="card-tools">
               <input class="fileInput" type="file" accept="application/pdf" hidden />
-              <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
-              <button class="iconBtn btnConvertOne" title="Bu kartı dönüştür" disabled>🔄</button>
-              <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
+              <button class="iconBtn btnAdd" title="PDF ekle">
+                <i data-lucide="plus"></i>
+              </button>
+              <button class="iconBtn btnConvertOne" title="Bu kartı dönüştür" disabled>
+                <i data-lucide="refresh-cw"></i>
+              </button>
+              <button class="iconBtn btnClear" title="Temizle" disabled>
+                <i data-lucide="x"></i>
+              </button>
             </div>
             
           </div>
@@ -163,7 +200,7 @@
           <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
             <div class="dz-inner">
               <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
-              <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+              <div class="dz-sub">veya sağ üstten <b><i data-lucide="plus" style="width:14px; height:14px; display:inline-block; vertical-align:middle;"></i></b> ile seç</div>
             </div>
             <div class="fileMeta hidden"></div>
           </div>
@@ -186,9 +223,15 @@
             </div>
             <div class="card-tools">
               <input class="fileInput" type="file" accept="application/pdf" hidden />
-              <button class="iconBtn btnAdd" title="PDF ekle">➕</button>
-              <button class="iconBtn btnConvertOne" title="Bu kartı dönüştür" disabled>🔄</button>
-              <button class="iconBtn btnClear" title="Temizle" disabled>✖</button>
+              <button class="iconBtn btnAdd" title="PDF ekle">
+                <i data-lucide="plus"></i>
+              </button>
+              <button class="iconBtn btnConvertOne" title="Bu kartı dönüştür" disabled>
+                <i data-lucide="refresh-cw"></i>
+              </button>
+              <button class="iconBtn btnClear" title="Temizle" disabled>
+                <i data-lucide="x"></i>
+              </button>
             </div>
             
           </div>
@@ -196,7 +239,7 @@
           <div class="dropzone" tabindex="0" role="button" aria-label="PDF sürükle bırak">
             <div class="dz-inner">
               <div class="dz-title">PDF’yi buraya sürükle-bırak</div>
-              <div class="dz-sub">veya sağ üstten <b>➕</b> ile seç</div>
+              <div class="dz-sub">veya sağ üstten <b><i data-lucide="plus" style="width:14px; height:14px; display:inline-block; vertical-align:middle;"></i></b> ile seç</div>
             </div>
             <div class="fileMeta hidden"></div>
           </div>
@@ -224,7 +267,9 @@
   <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"></script>
   <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 
   <script src="app.js"></script>
+
 </body>
 </html>

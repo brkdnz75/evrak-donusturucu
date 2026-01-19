@@ -544,4 +544,67 @@ img[src=""],img:not([src]){display:none;}
   padding-right: 110px; /* ne kadar sağa gitsin istiyorsan */
 }
 
-  
+  /* ===============================
+   MODERN ICON BUTTON SYSTEM
+   =============================== */
+
+/* HTML'deki sınıf adı .iconBtn olduğu için onu hedefliyoruz */
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #c7c7ff; /* Varsayılan ikon rengi */
+  padding: 0; /* Tarayıcı default padding'ini sıfırlama */
+}
+
+/* Lucide ikonları SVG olarak oluşturulur */
+.iconBtn svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+/* Hover Efektleri (Sadece aktif butonlar için) */
+.iconBtn:not(:disabled):hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+/* Tıklama Efekti */
+.iconBtn:not(:disabled):active {
+  transform: scale(0.95);
+}
+
+/* Disabled (Pasif) Durumu */
+.iconBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(100%);
+}
+
+/* -------------------------------
+   TEHLİKELİ (SİLME) BUTONLARI
+   HTML'de: .btnClear ve .btnClearImg sınıfları
+   ------------------------------- */
+.iconBtn.btnClear,
+.iconBtn.btnClearImg {
+  color: #fca5a5; /* Açık kırmızı */
+}
+
+.iconBtn.btnClear:not(:disabled):hover,
+.iconBtn.btnClearImg:not(:disabled):hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
