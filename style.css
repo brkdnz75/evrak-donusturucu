@@ -491,7 +491,7 @@ img[src=""],img:not([src]){display:none;}
 
    .card[data-doc="biyometrik_foto"] .result {
     /* sağ önizleme + indir butonu bloğu */
-    display: none; /* başlangıçta gizli kalsın */
+    display: block; /* başlangıçta gizli kalsın */
   }
   
   /* JS çıktı üretince .result.hidden kalkıyor -> o zaman göster */
