@@ -46,7 +46,6 @@ function updateTopButtons() {
   const anyOut = Object.values(state.outputs).some(Boolean);
 
   if (btnConvert) btnConvert.disabled = !hasFiles;
-
   if (btnDownloadAll) btnDownloadAll.disabled = !anyOut;
 
   if (btnClearAll) {
@@ -57,7 +56,6 @@ function updateTopButtons() {
     btnClearAll.disabled = !(hasFiles || hasText || anyOut);
   }
 
-  // Kart içi dönüştür butonlarını güncelle
   updatePerCardConvertButtons();
 }
 
@@ -117,13 +115,25 @@ async function renderPdfFirstPageToJpegBlob(file, quality = 0.92, scale = 2.0) {
   return blob;
 }
 
-// ===================== BIOMETRIC HELPERS =====================
+// ===================== BIOMETRIC HELPERS (GÜNCELLENDİ) =====================
 function mmToPx(mm, dpi = 300) {
   return Math.round((mm / 25.4) * dpi);
 }
 
 function getBioTarget(sizeStr) {
+  // --- YENİ EKLENEN ÖZEL ÖLÇÜ (400 DPI) ---
+  if (sizeStr === "ozel_25x32_5") {
+    return { 
+        w: 394, // 2.5 cm @ 400 DPI
+        h: 512, // 3.25 cm @ 400 DPI
+        label: "2.5x3.25_400dpi" 
+    };
+  }
+  
+  // Standart seçenekler (Varsayılan 300 DPI hesaplanır)
   if (sizeStr === "50x60") return { w: mmToPx(50), h: mmToPx(60), label: "50x60" };
+  
+  // Varsayılan 35x45
   return { w: mmToPx(35), h: mmToPx(45), label: "35x45" };
 }
 
@@ -170,11 +180,14 @@ async function whitenBackgroundWithSegmentation(srcCanvas) {
         outCanvas.height = h;
         const ctx = outCanvas.getContext("2d");
 
+        // 1. Orijinal resmi çiz
         ctx.drawImage(srcCanvas, 0, 0);
 
+        // 2. Maskeyi kullanarak arka planı temizle
         ctx.globalCompositeOperation = "destination-in";
         ctx.drawImage(results.segmentationMask, 0, 0, w, h);
 
+        // 3. Arka planı BEYAZ yap
         ctx.globalCompositeOperation = "destination-over";
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, w, h);
@@ -192,45 +205,70 @@ async function whitenBackgroundWithSegmentation(srcCanvas) {
 }
 
 async function makeBiometricJpeg(file, sizeStr, doWhiten) {
+  // 1. Resmi yükle
   const { canvas: srcCanvas } = await imageFileToCanvas(file);
 
+  // 2. Arka plan beyazlatma (opsiyonel ama isteklerinde var)
   let baseCanvas = srcCanvas;
   if (doWhiten) {
     baseCanvas = await whitenBackgroundWithSegmentation(srcCanvas);
   }
 
+  // 3. Hedef ölçüleri al (Yeni: 394x512 px)
   const target = getBioTarget(sizeStr);
-  const tw = target.w, th = target.h;
+  const tw = target.w;
+  const th = target.h;
 
+  // 4. Kırpma (Crop) Mantığı - Aspect Ratio Fit
   const targetRatio = tw / th;
   const sw = baseCanvas.width;
   const sh = baseCanvas.height;
   const srcRatio = sw / sh;
 
-  let cropW, cropH;
+  let cropW, cropH, cropX, cropY;
+
+  // Kaynak daha genişse (Yatay) -> Yanlardan kırp
   if (srcRatio > targetRatio) {
     cropH = sh;
     cropW = Math.round(sh * targetRatio);
-  } else {
+    cropX = Math.round((sw - cropW) / 2);
+    cropY = 0;
+  } 
+  // Kaynak daha uzunsa (Dikey) -> Üstten/Alttan kırp
+  else {
     cropW = sw;
     cropH = Math.round(sw / targetRatio);
+    cropX = 0;
+    // Yüz genelde biraz yukarıda olduğu için tam ortalamak yerine hafif yukarı odaklanabiliriz.
+    // Ancak standart olması için şimdilik tam ortalıyoruz.
+    cropY = Math.round((sh - cropH) / 2);
   }
 
-  const cropX = Math.round((sw - cropW) / 2);
-  const cropY = Math.round((sh - cropH) / 2);
-
+  // 5. Çıktı oluşturma
   const outCanvas = document.createElement("canvas");
   outCanvas.width = tw;
   outCanvas.height = th;
 
   const outCtx = outCanvas.getContext("2d", { alpha: false });
+  
+  // Yüksek Kalite Ayarları
   outCtx.imageSmoothingEnabled = true;
   outCtx.imageSmoothingQuality = "high";
 
-  outCtx.drawImage(baseCanvas, cropX, cropY, cropW, cropH, 0, 0, tw, th);
+  // Arka planı garantiye al (beyaz)
+  outCtx.fillStyle = "#ffffff";
+  outCtx.fillRect(0, 0, tw, th);
 
+  // Resmi yeniden boyutlandırarak çiz
+  outCtx.drawImage(
+    baseCanvas, 
+    cropX, cropY, cropW, cropH, 
+    0, 0, tw, th
+  );
+
+  // 6. Kaydetme - Kaliteyi 1.0 (Maksimum) yaptık
   const blob = await new Promise((resolve) =>
-    outCanvas.toBlob(resolve, "image/jpeg", 0.92)
+    outCanvas.toBlob(resolve, "image/jpeg", 1.0)
   );
 
   return blob;
@@ -246,7 +284,9 @@ function buildFilename(docKey) {
 function buildBioFilename(sizeStr) {
   const fn = sanitizeNamePart($("#firstName").value);
   const ln = sanitizeNamePart($("#lastName").value);
-  return `${fn}_${ln}_biyometrik_${sizeStr}.jpeg`;
+  // Dosya ismini biraz daha temiz yapalım
+  const safeSize = sizeStr.replace("ozel_", "").replace("_", "x");
+  return `${fn}_${ln}_biyometrik_${safeSize}.jpeg`;
 }
 
 // ===================== SINGLE CARD CONVERT =====================
@@ -268,19 +308,17 @@ async function convertOneCard(card) {
     return;
   }
 
-  // Kart içi butonu loading yap
   const localBtn = (key === "biyometrik_foto") ? $(".btnConvertBio", card) : $(".btnConvertOne", card);
-  
-  // ÖNEMLİ DEĞİŞİKLİK: textContent yerine innerHTML kullanıyoruz ki ikon yapısı kaybolmasın
   const oldHtml = localBtn?.innerHTML; 
   
   if (localBtn) {
     localBtn.disabled = true;
-    localBtn.innerHTML = "⏳"; // Yükleniyor ikonu
+    localBtn.innerHTML = "⏳"; 
   }
 
   try {
     if (key === "biyometrik_foto") {
+      // HTML Select'ten değeri al, yoksa varsayılan 35x45 kullan
       const sizeStr = $(".bio-size", card)?.value || "35x45";
       const doWhiten = ($(".bio-bg", card)?.value || "on") === "on";
 
@@ -322,13 +360,10 @@ async function convertOneCard(card) {
     alert("Dönüştürme sırasında bir hata oluştu. Konsolu (F12) kontrol edin.");
   } finally {
     if (localBtn) {
-        // İkonlu orijinal HTML yapısını geri yüklüyoruz
         localBtn.innerHTML = oldHtml || '<i data-lucide="refresh-cw"></i>';
     }
     updateTopButtons();
-    
-    // ÖNEMLİ: İkonları tekrar oluştur (Böylece kaybolmazlar)
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 }
 
@@ -763,9 +798,7 @@ async function convertAll() {
   const convertBtn = $("#btnConvert");
   convertBtn.disabled = true;
   
-  // ÖNEMLİ: textContent yerine innerHTML kaydediyoruz
   const oldHtml = convertBtn.innerHTML;
-  
   convertBtn.innerHTML = "🔄 Dönüştürülüyor...";
 
   try {
@@ -776,19 +809,15 @@ async function convertAll() {
       const file = state.files[key];
       if (!file) continue;
 
-      // tek kart dönüştür fonksiyonunu kullan
       await convertOneCard(card);
     }
   } catch (err) {
     console.error(err);
     alert("Dönüştürme sırasında bir hata oluştu. Konsolu (F12) kontrol edin.");
   } finally {
-    // HTML yapısını geri yükle
     convertBtn.innerHTML = oldHtml || ' <span class="ico"><i data-lucide="sparkles"></i></span> Dönüştür';
     updateTopButtons();
-    
-    // ÖNEMLİ: İkonları tekrar oluştur
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 }
 
@@ -866,12 +895,4 @@ function wireUp() {
 }
 
 window.addEventListener("DOMContentLoaded", wireUp);
-lucide.createIcons();
-
-
-
-
-
-
-
-
+if (typeof lucide !== 'undefined') lucide.createIcons();
